@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "noImplicitAny": true,
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "Node",
+        "sourceMap": true,
+        "alwaysStrict": true,
+        "diagnostics": false,
+        "listFiles": false,
+        "noEmitOnError": true,
+        "composite": true,
+        "outDir": "../",
+        "baseUrl": "../",
+        "paths": {
+            "magicmirror":["@types/magicmirror"]
+        }
+    },
+    "exclude": [
+
+    ],
+    "include": [
+        "./*"
+    ]
+}

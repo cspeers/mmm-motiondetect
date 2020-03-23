@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "alwaysStrict": true,
+        "diagnostics": false,
+        "listFiles": false,
+        "esModuleInterop": true,
+        "noEmitOnError": true,
+        "declaration": false
+    },
+    "references": [
+        {"path": "./server"},
+        {"path": "./client"}
+    ],
+    "exclude": [
+
+    ]
+}

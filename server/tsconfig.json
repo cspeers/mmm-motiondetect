@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "inlineSourceMap": false,
+        "noImplicitAny": true,
+        "target": "ES6",
+        "module": "CommonJS",
+        "esModuleInterop": true,
+        "moduleResolution": "Node",
+        "sourceMap": true,
+        "alwaysStrict": true,
+        "diagnostics": false,
+        "listFiles": false,
+        "noEmitOnError": true,
+        "composite": true,
+        "outDir": "../",
+        "baseUrl": "../",
+        "paths": {
+            "node_helper":["@types/node_helper"]
+        }
+    },
+    "exclude": [
+
+    ],
+    "include":[
+        "./*"
+    ]
+}

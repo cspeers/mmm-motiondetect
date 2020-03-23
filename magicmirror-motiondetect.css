@@ -1,0 +1,56 @@
+.hidden {
+    display: none;
+}
+
+body {
+    font-family: sans-serif;
+    font-weight: 300;
+    margin: 0;
+    padding: 1em;
+    word-break: break-word;
+}
+
+div.magicmirror-motiondetect div.module-content {
+    max-width: 50%;
+    margin: 0 auto 10px auto;
+    padding: 1em 1.5em 1.3em 1.5em;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+
+@media screen and (min-height:800px) {
+    video, canvas {
+        width: 320px;
+        height: 240px;
+        background-color: #999;
+    }
+}
+
+@media screen and (min-height:1200px) {
+    video, canvas {
+        width: 480px;
+        height: 360px;
+        background-color: #999;
+    }
+}
+
+@media screen and (min-height:1500px) {
+    video, canvas {
+        width: 640px;
+        height: 480px;
+        background-color: #999;
+    }
+}
+
+
+
+canvas.motion-canvas {
+    image-rendering: pixelated;
+}
+
+.hidden {
+    display:none !important;
+}
