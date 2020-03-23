@@ -10,7 +10,7 @@ const ModuleDetails = {
     name: "mmm-motiondetect",
     version: '1.0.0',
     scripts: ["diff-cam-engine.js"],
-    styles: ["mmm-motiondetect.css"]
+    styles: ["magicmirror-motiondetect.css"]
 };
 
 /** wrapper for the Magic Mirror logger */
@@ -42,7 +42,6 @@ interface IModuleConfiguration extends MagicMirror.ModuleConfiguration {
     differenceWidth:number
     /** the time after which the display will power off in seconds */
     displayTimeout:number
-    useDPMS:boolean
     checkState:boolean
 }
 
@@ -89,8 +88,7 @@ const moduleProperties:IModuleProperties = {
         differenceHeight: 48,
         differenceWidth:64,
         displayTimeout:120,
-        checkState:true,
-        useDPMS:false
+        checkState:true
     },
     onImageCaptureCallback(helper:ICameraDifferenceEngine){
 

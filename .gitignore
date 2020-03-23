@@ -102,3 +102,16 @@ dist
 
 # TernJS port file
 .tern-port
+*.d.ts
+*.js
+*.js.map
+node_helper.d.ts
+node_helper.js
+node_helper.js.map
+package-lock.json
+client/*.js
+client/*.js.map
+client/*.js
+client/*.js.map
+server/*.js
+server/*.js.map

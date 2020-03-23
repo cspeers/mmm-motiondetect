@@ -53,8 +53,6 @@ type SocketNotification = NodeHelper.NotificationType|
 interface IModuleConfiguration {
     /** whether to check the current power state */
     checkState:boolean
-    /** whether to use DPMS rather than rPI convention */
-    useDPMS:boolean
 }
 
 interface IAsyncOperation<T> {
@@ -73,6 +71,8 @@ type BooleanAsyncOperation=NodeHelper.ResultCallback<BooleanAsyncResult>
 
 /** module node helper configuration */
 interface IHelperConfig extends NodeHelper.IHelperConfig {
+    /** whether to use DPMS rather than rPI convention */
+    useDPMS:boolean
     /** the relevant module configuration */
     config:IModuleConfiguration
     /** whether the monitor is currently on */
@@ -89,15 +89,18 @@ interface IHelperConfig extends NodeHelper.IHelperConfig {
 
 //#endregion
 
+
+
 let helperConfig:IHelperConfig={
     monitorOn:false,
     config:undefined,
     operationRunning:false,
-
+    useDPMS:false,
     start(){
         Logger.info(`Starting Module Helper version : ${ModuleDetails.version} - ${os.platform()}:${os.arch()}`);
         //we'll force a 'safe config until we get on via socket
-        this.config={ checkState:true,useDPMS:!(os.arch()==='arm')}
+        this.useDPMS=!(os.arch()==='arm')
+        this.config={ checkState:true}
         Logger.info("Module Started!");
     },
     stop(){
@@ -111,8 +114,8 @@ let helperConfig:IHelperConfig={
         });
     },
     isMonitorOn(resultCallback: BooleanAsyncOperation): void {
-        let cmdLine = this.config.useDPMS ? DPMS_SCREEN_TEST_CMD : PI_SCREEN_TEST_CMD;
-        let resultCheck = this.config.useDPMS ?
+        let cmdLine = this.useDPMS ? DPMS_SCREEN_TEST_CMD : PI_SCREEN_TEST_CMD;
+        let resultCheck = this.useDPMS ?
             (s: string): boolean => { return s.trim() === 'On' } :
             (s: string): boolean => { return s.includes('=1') };
         Logger.info(`Querying Monitor Status..`);
@@ -134,7 +137,7 @@ let helperConfig:IHelperConfig={
         });
     },
     activateMonitor(resultCallback:BooleanAsyncOperation):void {
-        let cmdLine = this.config.useDPMS ? DPMS_SCREEN_ON_CMD : PI_SCREEN_ON_CMD;
+        let cmdLine = this.useDPMS ? DPMS_SCREEN_ON_CMD : PI_SCREEN_ON_CMD;
         let aResult:IAsyncOperation<boolean> = {
             currentOperationStart: moment().toDate(),
             currentOperationEnd: undefined,
@@ -175,7 +178,7 @@ let helperConfig:IHelperConfig={
         }
     },
     deActivateMonitor(resultCallback:BooleanAsyncOperation) {
-        let cmdLine = this.config.useDPMS ? DPMS_SCREEN_OFF_CMD : PI_SCREEN_OFF_CMD;
+        let cmdLine = this.useDPMS ? DPMS_SCREEN_OFF_CMD : PI_SCREEN_OFF_CMD;
         let aResult:IAsyncOperation<boolean> = {
             currentOperationStart: moment().toDate(),
             currentOperationEnd: undefined,
@@ -219,15 +222,14 @@ let helperConfig:IHelperConfig={
         Logger.info(`Received Notification ${notification}`);
         if (payload) {
             this.config=payload
-            Logger.info(`Use DPMS:${payload.useDPMS} Check State:${payload.checkState}`)
         }
         if(!this.operationRunning) {
             switch (notification) {
                 case 'ACTIVATE_MONITOR':
-                    Logger.info('Activating Monitor...')
+                    Logger.info(`Activating Monitor - Use DPMS:${this.useDPMS} Check State:${payload.checkState}`)
                     this.operationRunning=true
                     this.activateMonitor((r:BooleanAsyncResult) => {
-                        if(r.result){
+                        if(r.success){
                             this.sendSocketNotification('MONITOR_ON',
                             {
                                 monitorState:'ON',
@@ -241,10 +243,10 @@ let helperConfig:IHelperConfig={
                     })
                     break;
                 case 'DEACTIVATE_MONITOR':
-                    Logger.info('Deactivating Monitor...')
+                    Logger.info(`Deactivating Monitor - Use DPMS:${this.useDPMS} Check State:${payload.checkState}`)
                     this.operationRunning=true
                     this.deActivateMonitor((r:BooleanAsyncResult) => {
-                        if(r.result){
+                        if(r.success){
                             this.sendSocketNotification('MONITOR_OFF',
                             {
                                 monitorState:'OFF',
@@ -252,7 +254,7 @@ let helperConfig:IHelperConfig={
                             })
                         }
                         else {
-                            Logger.error('Turning on the monitor failed')
+                            Logger.error('Turning off the monitor failed')
                         }
                         this.operationRunning=false
                     })
