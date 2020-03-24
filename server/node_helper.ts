@@ -149,7 +149,7 @@ let helperConfig:IHelperConfig={
         };
         if (this.config.checkState) {
             this.isMonitorOn((r:IAsyncOperation<boolean>)=>{
-                Logger.info(`Power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
+                Logger.info(`Monitor power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
                 if (r.result) {
                     aResult.currentOperationEnd=moment().toDate()
                     aResult.result=true;
@@ -191,7 +191,7 @@ let helperConfig:IHelperConfig={
         };
         if (this.config.checkState) {
             this.isMonitorOn((r:IAsyncOperation<boolean>)=>{
-                Logger.info(`Power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
+                Logger.info(`Monitor power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
                 if (r.result) {
                     turnOffMonitor();
                 }
