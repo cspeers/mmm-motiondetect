@@ -15,11 +15,11 @@ const ModuleDetails = {
 /** Log wrapper */
 const Logger = {
     /** log info */
-    info(message: string) {console.info(`[${ModuleDetails.name}] ${message}`)},
+    info(message: string) {console.info(`[${ModuleDetails.name}]${message}`)},
     /** log warning */
-    warn(message: string) {console.warn(`[${ModuleDetails.name}] ${message}`)},
+    warn(message: string) {console.warn(`[${ModuleDetails.name}]${message}`)},
     /** log error */
-    error(message: string) {console.error(`[${ModuleDetails.name}] ${message}`)}
+    error(message: string) {console.error(`[${ModuleDetails.name}]${message}`)}
 };
 
 const operationHelper = {
@@ -223,6 +223,7 @@ let helperConfig:IHelperConfig={
                                 duration:operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)
                             };
                             this.sendSocketNotification('MONITOR_ON',mess)
+                            Logger.info(`${notification} transition to Monitor State:${mess.monitorState} took ${mess.duration} ms.`)
                         }
                         else {
                             Logger.error('Turning on the monitor failed')
@@ -238,8 +239,9 @@ let helperConfig:IHelperConfig={
                             let mess:IMonitorStateMessage={
                                 monitorState:'OFF',
                                 duration:operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)
-                            };                            
+                            };
                             this.sendSocketNotification('MONITOR_OFF',mess)
+                            Logger.info(`${notification} transition to Monitor State:${mess.monitorState} took ${mess.duration} ms.`)
                         }
                         else {
                             Logger.error('Turning off the monitor failed')

@@ -26,10 +26,8 @@ const Logger={
 type SocketMessage = MagicMirror.NotificationType|'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'
 type ModuleMessage = MagicMirror.ModuleNotificationType|'MOTION_DETECTED'|'MOTION_TIMEOUT'
 
-type MonitorState = 'ON'|'OFF'
-
 interface IMonitorStateMessage {
-    monitorState:MonitorState,
+    monitorState:'ON'|'OFF',
     duration:number
 }
 
@@ -165,6 +163,7 @@ const moduleProperties:IModuleProperties = {
         CameraDifferenceEngine.initialize(captureOptions)
             .then(async (a)=>a.start())
     },
+
     getScripts:() => ModuleDetails.scripts,
     getStyles: () => ModuleDetails.styles,
     start() {
@@ -221,7 +220,7 @@ const moduleProperties:IModuleProperties = {
         wrapper.appendChild(mainContainer);
         return wrapper;
     },
-    notificationReceived(notification:ModuleMessage, payload:any, sender:MagicMirror.IModuleInstance) {
+    notificationReceived(notification:ModuleMessage, payload:any, sender?:MagicMirror.IModuleInstance) {
         switch (notification) {
             case 'MODULE_DOM_CREATED':
                 Logger.info(`DOM Created!`);
