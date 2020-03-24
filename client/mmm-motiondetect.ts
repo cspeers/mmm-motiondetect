@@ -26,6 +26,13 @@ const Logger={
 type SocketMessage = MagicMirror.NotificationType|'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'
 type ModuleMessage = MagicMirror.ModuleNotificationType|'MOTION_DETECTED'|'MOTION_TIMEOUT'
 
+type MonitorState = 'ON'|'OFF'
+
+interface IMonitorStateMessage {
+    monitorState:MonitorState,
+    duration:number
+}
+
 /** configuration for the module */
 interface IModuleConfiguration extends MagicMirror.ModuleConfiguration {
     /** the interval for the video capture loop */
@@ -66,7 +73,7 @@ interface IModuleProperties extends MagicMirror.IModuleProperties {
     /** subclass of the notification received event */
     notificationReceived:MagicMirror.ModuleNotificationEvent
     /** subclass of the socket notification received event */
-    socketNotificationReceived:MagicMirror.ISocketNotificationEvent<SocketMessage,IModuleConfiguration>    
+    socketNotificationReceived:MagicMirror.ISocketNotificationEvent<SocketMessage,IMonitorStateMessage>    
 }
 
 //#endregion
@@ -225,14 +232,16 @@ const moduleProperties:IModuleProperties = {
                 break;
         }
     },    
-    socketNotificationReceived(message:SocketMessage,payload:any) {
+    socketNotificationReceived(message:SocketMessage,payload:IMonitorStateMessage) {
         Logger.info(`received socket notification ${message}`);
         switch (message) {
             case 'MONITOR_ON':
+                Logger.info(`${message} - MonitorState:${payload.monitorState} took ${payload.duration} ms.`)
                 this.monitorOff=false
                 this.operationPending=false
                 break;
             case 'MONITOR_OFF':
+                Logger.info(`${message} - MonitorState:${payload.monitorState} took ${payload.duration} ms.`)
                 this.monitorOff=true
                 this.operationPending=false
                 break;

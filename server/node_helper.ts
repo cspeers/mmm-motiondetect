@@ -49,6 +49,11 @@ const DPMS_SCREEN_ON_CMD = 'export DISPLAY=:0 && xset dpms force on';
 type SocketNotification = NodeHelper.NotificationType|
     'DEACTIVATE_MONITOR'|'ACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF';
 
+interface IMonitorStateMessage {
+    monitorState:'ON'|'OFF',
+    duration:number
+}
+
 /** stub for module node-helper configuration */
 interface IModuleConfiguration {
     /** whether to check the current power state */
@@ -94,6 +99,7 @@ let helperConfig:IHelperConfig={
     config:undefined,
     operationRunning:false,
     useDPMS:false,
+    
     isMonitorOn(resultCallback: BooleanAsyncOperation): void {
         let cmdLine = this.useDPMS ? DPMS_SCREEN_TEST_CMD : PI_SCREEN_TEST_CMD;
         let resultCheck = this.useDPMS ?
@@ -199,6 +205,7 @@ let helperConfig:IHelperConfig={
             turnOffMonitor();
         }
     },
+
     socketNotificationReceived(notification: SocketNotification, payload: IModuleConfiguration) {
         Logger.info(`Received Notification ${notification}`);
         if (payload) {
@@ -211,11 +218,11 @@ let helperConfig:IHelperConfig={
                     this.operationRunning=true
                     this.activateMonitor((r:BooleanAsyncResult) => {
                         if(r.success){
-                            this.sendSocketNotification('MONITOR_ON',
-                            {
+                            let mess:IMonitorStateMessage={
                                 monitorState:'ON',
                                 duration:operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)
-                            })
+                            };
+                            this.sendSocketNotification('MONITOR_ON',mess)
                         }
                         else {
                             Logger.error('Turning on the monitor failed')
@@ -228,11 +235,11 @@ let helperConfig:IHelperConfig={
                     this.operationRunning=true
                     this.deActivateMonitor((r:BooleanAsyncResult) => {
                         if(r.success){
-                            this.sendSocketNotification('MONITOR_OFF',
-                            {
+                            let mess:IMonitorStateMessage={
                                 monitorState:'OFF',
                                 duration:operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)
-                            })
+                            };                            
+                            this.sendSocketNotification('MONITOR_OFF',mess)
                         }
                         else {
                             Logger.error('Turning off the monitor failed')
