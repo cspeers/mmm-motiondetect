@@ -23,8 +23,8 @@ const Logger={
 //#region Declarations
 
 /** the expected socket notifications */
-type SocketMessage = MagicMirror.NotificationType|'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'
-type ModuleMessage = MagicMirror.ModuleNotificationType|'MOTION_DETECTED'|'MOTION_TIMEOUT'
+type SocketMessage = 'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'|MagicMirror.NotificationType
+type ModuleMessage = 'MOTION_DETECTED'|'MOTION_TIMEOUT'|MagicMirror.ModuleNotificationType
 
 /** simple socket message to convey the monitor power operation */
 interface IMonitorStateMessage {
@@ -115,16 +115,18 @@ const moduleProperties:IModuleProperties = {
         let now=new Date();
         let score = document.getElementById('score');
         score.innerText=`${result.score}`
+        let motionDetected=result.score > this.config.scoreThreshold
+        if(motionDetected) this.lastMotionDetected=now
         if(this.operationPending) {
             Logger.warn(`A previous power operation is in progress...`);
         }
         else {
             if ((this.monitorOff)) {
                 //should we turn off the monitor
-                if(result.score > this.config.scoreThreshold){
+                if(motionDetected){
                     this.operationPending=true
-                    this.lastMotionDetected=now
-                    this.sendNotification('MOTION_DETECTED',result.score)
+                    Logger.info(`Motion Detected with score ${result.score}`)
+                    this.sendNotification('MOTION_DETECTED',result)
                     this.sendSocketNotification('ACTIVATE_MONITOR',this.config)
                 }
             }
@@ -134,7 +136,7 @@ const moduleProperties:IModuleProperties = {
                 if(elapsed > (this.config.displayTimeout * 1000)) {
                     this.operationPending=true
                     Logger.info(`Timeout of ${this.config.displayTimeout} seconds elapsed.`)
-                    this.sendNotification('MOTION_TIMEOUT',result.score)
+                    this.sendNotification('MOTION_TIMEOUT',{})
                     this.sendSocketNotification('DEACTIVATE_MONITOR',this.config)
                 }
             }            
@@ -231,7 +233,7 @@ const moduleProperties:IModuleProperties = {
                 this.startImageCapture();
                 break;
             default:
-                //Logger.info(`Received notification ${notification} from ${sender?sender.name : 'system'}`)
+                // Logger.info(`Received notification ${notification} from ${sender?sender.name : 'system'}`)
                 break;
         }
     },    
