@@ -26,6 +26,7 @@ const Logger={
 type SocketMessage = MagicMirror.NotificationType|'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'
 type ModuleMessage = MagicMirror.ModuleNotificationType|'MOTION_DETECTED'|'MOTION_TIMEOUT'
 
+/** simple socket message to convey the monitor power operation */
 interface IMonitorStateMessage {
     monitorState:'ON'|'OFF',
     duration:number
@@ -53,6 +54,7 @@ interface IModuleConfiguration extends MagicMirror.ModuleConfiguration {
     displayPreview:boolean
 }
 
+/** module properties */
 interface IModuleProperties extends MagicMirror.IModuleProperties {
     /** the module version */
     version:string
@@ -166,18 +168,6 @@ const moduleProperties:IModuleProperties = {
 
     getScripts:() => ModuleDetails.scripts,
     getStyles: () => ModuleDetails.styles,
-    start() {
-        Log.info(`[${this.name}] Starting up...`);
-        this.lastMotionDetected = new Date()
-        /** make sure that the monitor is on when starting */
-        this.sendSocketNotification('ACTIVATE_MONITOR', {checkState:true,useDPMS:this.config.useDPMS});
-    },
-    stop() {
-        CameraDifferenceEngine.stop()
-            .then(a=>{Log.error(`[${this.name}] Usermedia capture stopped.`)})
-            .catch(e=>{Log.error(`[${this.name}] Error stopping Usermedia capture. ${e}`)})
-        Log.info(`[${this.name}] Module Stopped!`);
-    },    
     getDom() {
         Logger.info(`Updating DOM...`);
         
@@ -220,6 +210,20 @@ const moduleProperties:IModuleProperties = {
         wrapper.appendChild(mainContainer);
         return wrapper;
     },
+
+    start() {
+        Log.info(`[${this.name}] Starting up...`);
+        this.lastMotionDetected = new Date()
+        /** make sure that the monitor is on when starting */
+        this.sendSocketNotification('ACTIVATE_MONITOR', {checkState:true,useDPMS:this.config.useDPMS});
+    },
+    stop() {
+        CameraDifferenceEngine.stop()
+            .then(a=>{Log.error(`[${this.name}] Usermedia capture stopped.`)})
+            .catch(e=>{Log.error(`[${this.name}] Error stopping Usermedia capture. ${e}`)})
+        Log.info(`[${this.name}] Module Stopped!`);
+    },    
+
     notificationReceived(notification:ModuleMessage, payload:any, sender?:MagicMirror.IModuleInstance) {
         switch (notification) {
             case 'MODULE_DOM_CREATED':

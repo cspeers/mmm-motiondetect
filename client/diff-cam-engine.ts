@@ -144,6 +144,7 @@ interface ICameraDifferenceEngine extends ICameraDifferenceOptions {
 
 //#endregion
 
+/** concrete implementation of the camera difference engine */
 class CameraDifferenceEngineClass implements ICameraDifferenceEngine {
     readyToDifference: boolean
     timeout: any

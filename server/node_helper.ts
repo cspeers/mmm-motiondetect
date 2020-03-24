@@ -49,6 +49,7 @@ const DPMS_SCREEN_ON_CMD = 'export DISPLAY=:0 && xset dpms force on';
 type SocketNotification = NodeHelper.NotificationType|
     'DEACTIVATE_MONITOR'|'ACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF';
 
+/** simple socket message to convey the monitor power operation */
 interface IMonitorStateMessage {
     monitorState:'ON'|'OFF',
     duration:number
@@ -148,6 +149,7 @@ let helperConfig:IHelperConfig={
         };
         if (this.config.checkState) {
             this.isMonitorOn((r:IAsyncOperation<boolean>)=>{
+                Logger.info(`Power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
                 if (r.result) {
                     aResult.currentOperationEnd=moment().toDate()
                     aResult.result=true;
@@ -189,6 +191,7 @@ let helperConfig:IHelperConfig={
         };
         if (this.config.checkState) {
             this.isMonitorOn((r:IAsyncOperation<boolean>)=>{
+                Logger.info(`Power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
                 if (r.result) {
                     turnOffMonitor();
                 }
