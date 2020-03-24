@@ -1,5 +1,5 @@
 .hidden {
-    display: none;
+    display:none !important;
 }
 
 body {
@@ -11,7 +11,7 @@ body {
 }
 
 div.magicmirror-motiondetect div.module-content {
-    max-width: 50%;
+    max-width: 40%;
     margin: 0 auto 10px auto;
     padding: 1em 1.5em 1.3em 1.5em;
 }
@@ -29,7 +29,7 @@ html {
     }
 }
 
-@media screen and (min-height:1200px) {
+@media screen and (min-height:1200px) and (orientation: landscape) {
     video, canvas {
         width: 480px;
         height: 360px;
@@ -37,7 +37,7 @@ html {
     }
 }
 
-@media screen and (min-height:1500px) {
+@media screen and (min-height:1500px) and (orientation: landscape) {
     video, canvas {
         width: 640px;
         height: 480px;
@@ -45,12 +45,6 @@ html {
     }
 }
 
-
-
 canvas.motion-canvas {
     image-rendering: pixelated;
-}
-
-.hidden {
-    display:none !important;
 }

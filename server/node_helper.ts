@@ -89,30 +89,11 @@ interface IHelperConfig extends NodeHelper.IHelperConfig {
 
 //#endregion
 
-
-
 let helperConfig:IHelperConfig={
     monitorOn:false,
     config:undefined,
     operationRunning:false,
     useDPMS:false,
-    start(){
-        Logger.info(`Starting Module Helper version : ${ModuleDetails.version} - ${os.platform()}:${os.arch()}`);
-        //we'll force a 'safe config until we get on via socket
-        this.useDPMS=!(os.arch()==='arm')
-        this.config={ checkState:true}
-        Logger.info("Module Started!");
-    },
-    stop(){
-        Logger.info(`Stopping Module Helper...`);
-        //we'll try and turn the monitor on the way out.
-        this.activateMonitor((r:IAsyncOperation<boolean>)=>{
-            if(!r.success || !r.result){
-                Logger.error(`Error re-activating monitor`)
-            }
-            Logger.info(`Power Check took .${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms..`)
-        });
-    },
     isMonitorOn(resultCallback: BooleanAsyncOperation): void {
         let cmdLine = this.useDPMS ? DPMS_SCREEN_TEST_CMD : PI_SCREEN_TEST_CMD;
         let resultCheck = this.useDPMS ?
@@ -266,10 +247,24 @@ let helperConfig:IHelperConfig={
         else {
             Logger.warn('An operation is already in progress')
         }
+    },
+    start(){
+        Logger.info(`Starting Module Helper version : ${ModuleDetails.version} - ${os.platform()}:${os.arch()}`);
+        //we'll force a 'safe config until we get on via socket
+        this.useDPMS=!(os.arch()==='arm')
+        this.config={ checkState:true}
+        Logger.info("Module Started!");
+    },
+    stop(){
+        Logger.info(`Stopping Module Helper...`);
+        //we'll try and turn the monitor on the way out.
+        this.activateMonitor((r:IAsyncOperation<boolean>)=>{
+            if(!r.success || !r.result){
+                Logger.error(`Error re-activating monitor`)
+            }
+            Logger.info(`Power Check took .${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms..`)
+        });
     }
 };
 
 module.exports = NodeHelper.create(helperConfig);
-
-
-

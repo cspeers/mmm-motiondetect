@@ -20,7 +20,7 @@ const Logger={
     error:(m:string):void => Log.error(`[${ModuleDetails.name}] ${m}`)
 };
 
-//#region Declarationss
+//#region Declarations
 
 /** the expected socket notifications */
 type SocketMessage = MagicMirror.NotificationType|'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'
@@ -42,7 +42,10 @@ interface IModuleConfiguration extends MagicMirror.ModuleConfiguration {
     differenceWidth:number
     /** the time after which the display will power off in seconds */
     displayTimeout:number
+    /** whether to check the monitor state before changing */
     checkState:boolean
+    /** whether to show the captured video */
+    displayPreview:boolean
 }
 
 interface IModuleProperties extends MagicMirror.IModuleProperties {
@@ -88,8 +91,10 @@ const moduleProperties:IModuleProperties = {
         differenceHeight: 48,
         differenceWidth:64,
         displayTimeout:120,
-        checkState:true
+        checkState:true,
+        displayPreview:false
     },
+    
     onImageCaptureCallback(helper:ICameraDifferenceEngine){
 
     },
