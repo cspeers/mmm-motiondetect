@@ -7,13 +7,13 @@ type NotifcationSender=object;
 type ModuleConfiguration=object;
 
 
+/** Module socket notification event method*/
 export interface ISocketNotificationEvent<N,P> {
     (message: N, moduleProperties: P): void
 }
 
-/** Module socket notification event method*/
+/** Module socker notification event method*/
 export type SocketNotifcationEvent=ISocketNotificationEvent<NotificationType,NotificationPayload>
-
 
 /** module notification event */
 export interface IModuleNotificationEvent<N,P,S> {
@@ -30,7 +30,7 @@ export type ModuleNotificationEvent = IModuleNotificationEvent<NotificationType,
 
 /** Options for hiding and showing module content */
 export interface IViewableOptions {
-    lockString:string;
+    lockString?:string;
     force?:boolean;
 }
 
@@ -60,10 +60,7 @@ export interface IModuleProperties {
     requiresVersion?: string
     /** Timer reference used for showHide animation callbacks. */
     showHideTimer?: any
-    /**
-     * Array to store lockStrings. These strings are used to lock
-     * visibility when hiding and showing module. 
-     */
+    /** Array to store lockStrings. These strings are used to lock visibility */
     lockStrings?: Array<string>
     /** Module Setting Defaults */
     defaults?: ModuleConfiguration
@@ -83,31 +80,38 @@ export interface IModuleProperties {
     getTemplateData?(): object
     /** Retreives the dictionary of localization files */
     getTranslations?(): Map<string,string>
-    /**
-     * Event fired on receipt of a module notification
+    /** Event fired on receipt of a module notification
      * @param {string} notification - The notification to be sent
      * @param {object} payload  - The notification payload
      * @param {object} sender   - The message sender
      */
     notificationReceived?:ModuleNotificationEvent
-    /**
-     * Event fired on receipt of a socket notification
+    /** Event fired on receipt of a socket notification
      * @param {string} notification - The notification to be sent
      * @param {object} payload  - The notification payload
      */
     socketNotificationReceived?:SocketNotifcationEvent
-    /**
-     * Sends a module notification
+    /** Sends a module notification
      * @param {string} notification - The notification to be sent
      * @param {object} payload  - The notification payload
      */
     sendNotification?:SocketNotifcationEvent
-    /** Hides the module */
+    /** Hides the module
+     * @param {number} speed The speed of the animation
+     * @param {Function} callback The callback on completion
+     * @param {IViewableOptions} options The locking options
+     */
+    hide?(speed?:number,options?:IViewableOptions):void
     hide?(speed?:number, callback?:Function, options?:IViewableOptions):void
     hide?(speed:number, callback:Function, options?:IViewableOptions):void
     /** Run on module hidden */
     suspend?(): void
-    /** Shows the module */
+    /** Shows the module
+     * @param {number} speed The speed of the animation
+     * @param {Function} callback The callback on completion
+     * @param {IViewableOptions} options The locking options
+     */    
+    show?(speed?:number,options?:IViewableOptions):void
     show?(speed?:number, callback?:Function, options?:IViewableOptions):void
     show?(speed:number, callback:Function, options?:IViewableOptions):void 
     /** executed when a SIGINT is received */
@@ -161,9 +165,31 @@ export interface IMagicMirrorLog {
     timeStamp(timerName?: string): void
 }
 
+/** signature for module instance callback */
+interface IModuleInstanceCallback {
+    (module:IModuleInstance):void
+}
+
+/** wrapper for instance collection to support fluid methods */
+interface IModuleInstanceCollection extends Array<IModuleInstance> {
+    /** execute the method across all instances */
+    enumerate(callback:IModuleInstanceCallback):IModuleInstanceCollection;
+    /** use the selection class
+     * @param classnames the class names to include
+    */
+    withClass(classnames:string|Array<string>):IModuleInstanceCollection;
+    /** use the exclusion class
+     * @param classnames the class names to exclude
+    */
+    exceptWithClass(classnames:string|Array<string>):IModuleInstanceCollection;
+    /** exclude the module instance
+     * @param {IModuleInstance} module the module instance
+    */
+    exceptModule(module:IModuleInstance):IModuleInstanceCollection;
+}
+
 /** Interface representing the magicmirror static MM class*/
-export interface IMagicMirrorStatic
-{
+export interface IMagicMirrorStatic {
     /** Called on initialization */
     init:()=>void
     /** Called when all modules are started */
@@ -180,9 +206,7 @@ export interface IMagicMirrorStatic
     */
     updateDom: (module:any, speed:number)=>Promise<any>
     /** Retrieves the list of configured module names */
-    getModules:()=>Array<any>,
-    withClass:(classnames:string|Array<string>)=>Array<any>
-    exceptWithClass:(classnames:string|Array<string>)=>Array<any>
+    getModules():IModuleInstanceCollection,
     /** hides the module */
     hideModule: (module:any, speed:number, callback:any, options:object)=>void
     /** shows the module */
