@@ -222,14 +222,16 @@ class CameraDifferenceEngineClass implements ICameraDifferenceEngine {
             rgba[i + 2] = 0;
             if (pixelDiff >= this.pixelThreshold) {
                 score++
-                //calculate the coordinates
-                let coords = this.calculateCoordinates(i / 4)
-                //calculate the motion box
-                if (this.includeMotionBox) {
-                    motionBox = this.calculateMotionBox(motionBox, coords, coords.x, coords.y)
-                }
-                if (this.includeMotionPixels) {
-                    motionPixels = this.calculateMotionPixels(motionPixels, coords.x, coords.y)
+                if(this.includeMotionBox || this.includeMotionPixels) {
+                    //calculate the coordinates
+                    let coords = this.calculateCoordinates(i / 4)
+                    //calculate the motion box
+                    if (this.includeMotionBox) {
+                        motionBox = this.calculateMotionBox(motionBox, coords, coords.x, coords.y)
+                    }
+                    if (this.includeMotionPixels) {
+                        motionPixels = this.calculateMotionPixels(motionPixels, coords.x, coords.y)
+                    }
                 }
             }
         }
@@ -242,6 +244,9 @@ class CameraDifferenceEngineClass implements ICameraDifferenceEngine {
     //#endregion
 
     private capture(): void {
+
+        this.onImageCaptureCallback(this)
+
         //save full-sized copy
         this.captureContext.drawImage(this.video, 0, 0);
         let captureImageData = this.captureContext.getImageData(0, 0, this.captureSize.width, this.captureSize.height);
@@ -280,7 +285,6 @@ class CameraDifferenceEngineClass implements ICameraDifferenceEngine {
         this.differenceContext.globalCompositeOperation = 'source-over';
         this.differenceContext.drawImage(this.video, 0, 0, this.differenceSize.width, this.differenceSize.height);
         this.readyToDifference = true;
-        this.onImageCaptureCallback(this)
         this.timeout = setTimeout(() => this.capture(), this.captureInterval);
     }
 
@@ -321,7 +325,7 @@ class CameraDifferenceEngineClass implements ICameraDifferenceEngine {
             this.motionCanvas.height = this.differenceSize.height;
             this.motionContext = this.motionCanvas.getContext('2d');
 
-            this.log.info("Intializing User Media Stream...")
+            this.log.info(`Intializing User Media Stream (${this.captureSize.width}x${this.captureSize.height})...`)
             this.stream = await navigator.mediaDevices.getUserMedia(this.constraints);
             this.onStreamReadyCallback(this)
             return this;
@@ -331,7 +335,7 @@ class CameraDifferenceEngineClass implements ICameraDifferenceEngine {
     }
     async start(): Promise<ICameraDifferenceEngine> {
         try {
-            this.log.info('Starting UserMedia Capture to Stream...');
+            this.log.info(`Starting UserMedia Capture to Stream with interval... ${this.captureInterval}`);
             if (!this.stream) {
                 throw 'The media stream is not initialized!';
             }

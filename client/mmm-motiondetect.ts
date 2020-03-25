@@ -52,6 +52,8 @@ interface IModuleConfiguration extends MagicMirror.ModuleConfiguration {
     checkState:boolean
     /** whether to show the captured video */
     displayPreview:boolean
+    /** whether to blank using power */
+    usePower:boolean
 }
 
 /** module properties */
@@ -99,7 +101,8 @@ const moduleProperties:IModuleProperties = {
         differenceWidth:64,
         displayTimeout:120,
         checkState:true,
-        displayPreview:false
+        displayPreview:false,
+        usePower:true
     },
     
     onImageCaptureCallback(helper:ICameraDifferenceEngine){
@@ -126,8 +129,25 @@ const moduleProperties:IModuleProperties = {
                 if(motionDetected){
                     this.operationPending=true
                     Logger.info(`Motion Detected with score ${result.score}`)
+                    if(this.config.usePower) {
+                        this.sendSocketNotification('ACTIVATE_MONITOR',this.config)
+                    } 
+                    else {
+                        MM.getModules().enumerate((module)=>{
+                            module.show(0)
+                        })
+                        this.monitorOff=false
+                        this.operationPending=false
+                    }
                     this.sendNotification('MOTION_DETECTED',result)
-                    this.sendSocketNotification('ACTIVATE_MONITOR',this.config)
+                }
+                else
+                {
+                    if (!this.config.usePower) {
+                        MM.getModules().enumerate((module)=>{
+                            if(!module.hidden) module.hide(0,{force:true})
+                        })
+                    }
                 }
             }
             else {
@@ -136,15 +156,26 @@ const moduleProperties:IModuleProperties = {
                 if(elapsed > (this.config.displayTimeout * 1000)) {
                     this.operationPending=true
                     Logger.info(`Timeout of ${this.config.displayTimeout} seconds elapsed.`)
+                    this.operationPending=true
+                    Logger.info(`Motion Detected with score ${result.score}`)
+                    if(this.config.usePower) {
+                        this.sendSocketNotification('DEACTIVATE_MONITOR',this.config)
+                    }
+                    else {
+                        MM.getModules().enumerate((module)=>{
+                            module.hide(1000,{force:true})
+                        })
+                        this.monitorOff=true
+                        this.operationPending=false
+                    }                    
                     this.sendNotification('MOTION_TIMEOUT',{})
-                    this.sendSocketNotification('DEACTIVATE_MONITOR',this.config)
                 }
             }            
         }
     },    
     startImageCapture(){
         let captureOptions: ICameraDifferenceOptions = {
-            captureInterval: this.captureIntervalTime,
+            captureInterval: this.config.captureIntervalTime,
             constraints: {
                 audio: false,
                 video: {
@@ -216,15 +247,23 @@ const moduleProperties:IModuleProperties = {
     start() {
         Log.info(`[${this.name}] Starting up...`);
         this.lastMotionDetected = new Date()
-        /** make sure that the monitor is on when starting */
-        this.sendSocketNotification('ACTIVATE_MONITOR', {checkState:true,useDPMS:this.config.useDPMS});
+        if(this.config.usePower){
+            /** make sure that the monitor is on when starting */
+            this.sendSocketNotification('ACTIVATE_MONITOR', {checkState:true});
+        }
     },
     stop() {
         CameraDifferenceEngine.stop()
             .then(a=>{Log.error(`[${this.name}] Usermedia capture stopped.`)})
             .catch(e=>{Log.error(`[${this.name}] Error stopping Usermedia capture. ${e}`)})
         Log.info(`[${this.name}] Module Stopped!`);
-    },    
+    },
+    suspend(){
+        Logger.info(`Module Suspended...`)
+    },
+    resume(){
+        Logger.info(`Module Resumed...`)
+    },
 
     notificationReceived(notification:ModuleMessage, payload:any, sender?:MagicMirror.IModuleInstance) {
         switch (notification) {
