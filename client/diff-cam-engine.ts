@@ -252,7 +252,7 @@ class CameraDifferenceEngineClass implements ICameraDifferenceEngine {
         let captureImageData = this.captureContext.getImageData(0, 0, this.captureSize.width, this.captureSize.height);
         //difference over previous capture
         this.differenceContext.globalCompositeOperation = 'difference';
-        this.differenceContext.drawImage(this.video, 0, 0, this.differenceSize.width, this.differenceSize.height);
+        this.differenceContext.drawImage(this.captureCanvas, 0, 0, this.differenceSize.width, this.differenceSize.height);
         let diffImageData = this.differenceContext.getImageData(0, 0, this.differenceSize.width, this.differenceSize.height);
         if (this.readyToDifference) {
             let difference = this.processDifference(diffImageData);

@@ -187,16 +187,19 @@ const moduleProperties:IModuleProperties = {
             video:this.video,
             motionCanvas:this.canvas,
             scoreThreshold:this.config.scoreThreshold,
-            includeMotionBox:true,
-            includeMotionPixels:true,
-            differenceSize:{height:48,width:64},          
+            includeMotionBox:this.config.displayPreview,
+            includeMotionPixels:this.config.displayPreview,
+            differenceSize:{height:this.config.captureHeight/10,width:this.config.captureWidth/10},          
             onImageCaptureCallback: (e) => this.onImageCaptureCallback(e),
             onStreamReadyCallback: (e) => this.onStreamReadyCallback(e),
             onStreamStopCallback: (e) => this.onStreamStopCallback(e),
             onDifferenceCallback: (e) => this.onImageScored(e)
         };
         CameraDifferenceEngine.initialize(captureOptions)
-            .then(async (a)=>a.start())
+            .then(async (a)=>{
+                a.start();
+                Logger.info(`Started watching camera stream on ${this.config.captureIntervalTime}.ms interval.`)
+            })
     },
 
     getScripts:() => ModuleDetails.scripts,

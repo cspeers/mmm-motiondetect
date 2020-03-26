@@ -38,9 +38,10 @@ const PI_SCREEN_TEST_CMD = 'vcgencmd display_power';
 const PI_SCREEN_ON_CMD = 'vcgencmd display_power 1';
 const PI_SCREEN_OFF_CMD = 'vcgencmd display_power 0';
 
-const DPMS_SCREEN_TEST_CMD = "export DISPLAY=:0;xset q|sed -ne 's/^[ ]*Monitor is //p'"
-const DPMS_SCREEN_OFF_CMD = 'export DISPLAY=:0 && xset dpms force off';
-const DPMS_SCREEN_ON_CMD = 'export DISPLAY=:0 && xset dpms force on';
+const DPMS_SCREEN_TEST_CMD = "export DISPLAY=$(w -oush | grep -Eo ' :[0-9]+' | uniq | cut -d \\  -f 2) && xset q|sed -ne 's/^[ ]*Monitor is //p'"
+const DPMS_SCREEN_OFF_CMD = "export DISPLAY=$(w -oush | grep -Eo ' :[0-9]+' | uniq | cut -d \\  -f 2) && xset dpms force off";
+const DPMS_SCREEN_STANDBY_CMD = "export DISPLAY=$(w -oush | grep -Eo ' :[0-9]+' | uniq | cut -d \\  -f 2) && xset dpms force standby"
+const DPMS_SCREEN_ON_CMD = "export DISPLAY=$(w -oush | grep -Eo ' :[0-9]+' | uniq | cut -d \\  -f 2) && xset dpms force on";
 //#endregion
 
 //#region Declarations
@@ -104,7 +105,7 @@ let helperConfig:IHelperConfig={
     isMonitorOn(resultCallback: BooleanAsyncOperation): void {
         let cmdLine = this.useDPMS ? DPMS_SCREEN_TEST_CMD : PI_SCREEN_TEST_CMD;
         let resultCheck = this.useDPMS ?
-            (s: string): boolean => { return s.trim() === 'On' } :
+            (s: string): boolean => { return s.trim() === 'On'} :
             (s: string): boolean => { return s.includes('=1') };
         Logger.info(`Querying Monitor Status..`);
         let aResult:IAsyncOperation<boolean> = {
@@ -168,6 +169,7 @@ let helperConfig:IHelperConfig={
     },
     deActivateMonitor(resultCallback:BooleanAsyncOperation) {
         let cmdLine = this.useDPMS ? DPMS_SCREEN_OFF_CMD : PI_SCREEN_OFF_CMD;
+        //let cmdLine = this.useDPMS ? DPMS_SCREEN_STANDBY_CMD : PI_SCREEN_OFF_CMD;
         let aResult:IAsyncOperation<boolean> = {
             currentOperationStart: moment().toDate(),
             currentOperationEnd: undefined,
