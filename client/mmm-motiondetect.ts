@@ -54,6 +54,8 @@ interface IModuleConfiguration extends MagicMirror.ModuleConfiguration {
     displayPreview:boolean
     /** whether to blank using power */
     usePower:boolean
+    /** the time the module fade will be */
+    fadeoutTime:number
 }
 
 /** module properties */
@@ -102,7 +104,8 @@ const moduleProperties:IModuleProperties = {
         displayTimeout:120,
         checkState:true,
         displayPreview:false,
-        usePower:true
+        usePower:true,
+        fadeoutTime:500
     },
     
     onImageCaptureCallback(helper:ICameraDifferenceEngine){
@@ -163,7 +166,7 @@ const moduleProperties:IModuleProperties = {
                     }
                     else {
                         MM.getModules().enumerate((module)=>{
-                            module.hide(1000,{force:true})
+                            module.hide(this.config.fadeoutTime,{force:true})
                         })
                         this.monitorOff=true
                         this.operationPending=false
