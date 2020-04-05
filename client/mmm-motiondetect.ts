@@ -23,7 +23,7 @@ const Logger={
 //#region Declarations
 
 /** the expected socket notifications */
-type SocketMessage = 'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'|MagicMirror.NotificationType
+type SocketMessage = 'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'|'MOTION_DETECTED'|'MOTION_TIMEOUT'|MagicMirror.NotificationType
 type ModuleMessage = 'MOTION_DETECTED'|'MOTION_TIMEOUT'|MagicMirror.ModuleNotificationType
 
 /** simple socket message to convey the monitor power operation */
@@ -143,6 +143,7 @@ const moduleProperties:IModuleProperties = {
                         this.operationPending=false
                     }
                     this.sendNotification('MOTION_DETECTED',result)
+                    this.sendSocketNotification('MOTION_DETECTED')
                 }
                 else
                 {
@@ -172,6 +173,7 @@ const moduleProperties:IModuleProperties = {
                         this.operationPending=false
                     }                    
                     this.sendNotification('MOTION_TIMEOUT',{})
+                    this.sendSocketNotification('MOTION_TIMEOUT')
                 }
             }            
         }

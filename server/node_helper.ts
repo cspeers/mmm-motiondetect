@@ -47,8 +47,7 @@ const DPMS_SCREEN_ON_CMD = "export DISPLAY=$(w -oush | grep -Eo ' :[0-9]+' | uni
 //#region Declarations
 
 /** expected socket notification message types */
-type SocketNotification = NodeHelper.NotificationType|
-    'DEACTIVATE_MONITOR'|'ACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF';
+type SocketNotification = NodeHelper.NotificationType|'DEACTIVATE_MONITOR'|'ACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'|'MOTION_DETECTED'|'MOTION_TIMEOUT';
 
 /** simple socket message to convey the monitor power operation */
 interface IMonitorStateMessage {
@@ -216,9 +215,9 @@ let helperConfig:IHelperConfig={
         if (payload) {
             this.config=payload
         }
-        if(!this.operationRunning) {
-            switch (notification) {
-                case 'ACTIVATE_MONITOR':
+        switch (notification) {
+            case 'ACTIVATE_MONITOR':
+                if(!this.operationRunning) {
                     Logger.info(`Activating Monitor - Use DPMS:${this.useDPMS} Check State:${payload.checkState}`)
                     this.operationRunning=true
                     this.activateMonitor((r:BooleanAsyncResult) => {
@@ -235,8 +234,13 @@ let helperConfig:IHelperConfig={
                         }
                         this.operationRunning=false
                     })
-                    break;
-                case 'DEACTIVATE_MONITOR':
+                }
+                else {
+                    Logger.warn('An operation is already in progress')
+                }
+                break;
+            case 'DEACTIVATE_MONITOR':
+                if(!this.operationRunning) {
                     Logger.info(`Deactivating Monitor - Use DPMS:${this.useDPMS} Check State:${payload.checkState}`)
                     this.operationRunning=true
                     this.deActivateMonitor((r:BooleanAsyncResult) => {
@@ -253,13 +257,16 @@ let helperConfig:IHelperConfig={
                         }
                         this.operationRunning=false
                     })
-                    break;
-                default:
-                    break;
-            }                    
-        }
-        else {
-            Logger.warn('An operation is already in progress')
+                }
+                else {
+                    Logger.warn('An operation is already in progress')
+                }
+                break;
+            case 'MOTION_DETECTED':
+            case 'MOTION_TIMEOUT':
+            default:
+                //Do Something
+                break;
         }
     },
     start(){
