@@ -136,9 +136,9 @@ var motionModuleProperties:IMotionModuleProperties = {
                         })
                         this.monitorOff=false
                         this.operationPending=false
+                        this.sendSocketNotification('MOTION_DETECTED')
                     }
                     this.sendNotification('MOTION_DETECTED',result)
-                    this.sendSocketNotification('MOTION_DETECTED')
                 }
                 else
                 {
@@ -166,13 +166,13 @@ var motionModuleProperties:IMotionModuleProperties = {
                         })
                         this.monitorOff=true
                         this.operationPending=false
+                        this.sendSocketNotification('MOTION_TIMEOUT')
                     }                    
                     this.sendNotification('MOTION_TIMEOUT',{})
-                    this.sendSocketNotification('MOTION_TIMEOUT')
                 }
             }            
         }
-    },    
+    },   
     startImageCapture(){
         let captureOptions: ICameraDifferenceOptions = {
             captureInterval: this.config.captureIntervalTime,
@@ -248,7 +248,7 @@ var motionModuleProperties:IMotionModuleProperties = {
     },
 
     start() {
-        Log.info(`[${this.name}] Starting up...`);
+        MotionDetectLogger.info(`Starting up...`);
         this.lastMotionDetected = new Date()
         if(this.config.usePower){
             /** make sure that the monitor is on when starting */
@@ -257,8 +257,8 @@ var motionModuleProperties:IMotionModuleProperties = {
     },
     stop() {
         CameraDifferenceEngine.stop()
-            .then(a=>{Log.error(`[${this.name}] Usermedia capture stopped.`)})
-            .catch(e=>{Log.error(`[${this.name}] Error stopping Usermedia capture. ${e}`)})
+            .then(a=>{MotionDetectLogger.error(`Usermedia capture stopped.`)})
+            .catch(e=>{MotionDetectLogger.error(`Error stopping Usermedia capture. ${e}`)})
         Log.info(`[${this.name}] Module Stopped!`);
     },
     suspend(){
