@@ -77,7 +77,7 @@ interface IMotionModuleProperties extends IModuleProperties {
 
 //#endregion
 
-var motionModuleProperties:IMotionModuleProperties = {
+let motionModuleProperties:IMotionModuleProperties = {
     name:MotionModuleDetails.name,
     version:MotionModuleDetails.version,
     identifier:undefined,
