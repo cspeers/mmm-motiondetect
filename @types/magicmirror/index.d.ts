@@ -1,22 +1,22 @@
 //Declarations for the MagicMirror client side objects
 
-type NotificationType=string;
-type ModuleNotificationType=string|'ALL_MODULES_STARTED'|'DOM_OBJECTS_CREATED'|'MODULE_DOM_CREATED';
-type NotificationPayload=object;
-type NotifcationSender=object;
-type ModuleConfiguration=object;
+declare type NotificationType=string;
+declare type ModuleNotificationType=string|'ALL_MODULES_STARTED'|'DOM_OBJECTS_CREATED'|'MODULE_DOM_CREATED';
+declare type NotificationPayload=object;
+declare type NotifcationSender=object;
+declare type ModuleConfiguration=object;
 
 
 /** Module socket notification event method*/
-export interface ISocketNotificationEvent<N,P> {
+declare interface ISocketNotificationEvent<N,P> {
     (message: N, moduleProperties: P): void
 }
 
 /** Module socker notification event method*/
-export type SocketNotifcationEvent=ISocketNotificationEvent<NotificationType,NotificationPayload>
+declare type SocketNotifcationEvent=ISocketNotificationEvent<NotificationType,NotificationPayload>
 
 /** module notification event */
-export interface IModuleNotificationEvent<N,P,S> {
+declare interface IModuleNotificationEvent<N,P,S> {
     /**
      * @param notification The notfication type
      * @param payload The notification 
@@ -26,16 +26,16 @@ export interface IModuleNotificationEvent<N,P,S> {
 }
 
 /** Module notification event method*/
-export type ModuleNotificationEvent = IModuleNotificationEvent<NotificationType,NotificationPayload,NotifcationSender>;
+declare type ModuleNotificationEvent = IModuleNotificationEvent<NotificationType,NotificationPayload,NotifcationSender>;
 
 /** Options for hiding and showing module content */
-export interface IViewableOptions {
+declare interface IViewableOptions {
     lockString?:string;
     force?:boolean;
 }
 
 /** module metadata */
-export interface IModulePropertyData {
+declare interface IModulePropertyData {
     /** classes which are added to the module dom wrapper */
     classes:Array<string>
     /** filename of the core module file */
@@ -49,7 +49,7 @@ export interface IModulePropertyData {
 }
 
 /** Interface representing module initialization properties */
-export interface IModuleProperties {
+declare interface IModuleProperties {
     /** the module name */
     name:string
     /** module unique indentifier */
@@ -135,7 +135,7 @@ export interface IModuleProperties {
 }
 
 /** Interface representing an instance of a module */
-export interface IModuleInstance extends IModuleProperties {
+declare interface IModuleInstance extends IModuleProperties {
     name: string,
     identifier: string,
     hidden: boolean,
@@ -143,7 +143,7 @@ export interface IModuleInstance extends IModuleProperties {
 }
 
 /** Interface representing the magicmirror static Module class*/
-export interface IMagicMirrorModule {
+declare interface IMagicMirrorModule {
     /**
      * @param {string} moduleName The name of the module (as specified by folder and config.js)
      * @param {IModuleProperties} moduleProperties The module instance initializer
@@ -152,7 +152,7 @@ export interface IMagicMirrorModule {
 }
 
 /** Interface representing the MagicMirror static Log class*/
-export interface IMagicMirrorLog {
+declare interface IMagicMirrorLog {
     info(message?: any, ...optionalParams: any[]): void
     log(message?: any, ...optionalParams: any[]): void
     error(message?: any, ...optionalParams: any[]): void
@@ -189,7 +189,7 @@ interface IModuleInstanceCollection extends Array<IModuleInstance> {
 }
 
 /** Interface representing the magicmirror static MM class*/
-export interface IMagicMirrorStatic {
+declare interface IMagicMirrorStatic {
     /** Called on initialization */
     init:()=>void
     /** Called when all modules are started */
@@ -212,3 +212,10 @@ export interface IMagicMirrorStatic {
     /** shows the module */
     showModule: (module:any, speed:number, callback:any, options:object)=>void
 }
+
+/** MagicMirror Logger */
+declare const Log:IMagicMirrorLog
+/** MagicMirror Static Helper */
+declare const MM:IMagicMirrorStatic
+/** Module Loader */
+declare const Module:IMagicMirrorModule

@@ -1,12 +1,7 @@
 'use strict'
-import * as MagicMirror from "magicmirror"
-
-declare const Log: MagicMirror.IMagicMirrorLog;
-declare const Module: MagicMirror.IMagicMirrorModule;
-declare const MM:MagicMirror.IMagicMirrorStatic;
 
 /** Module constants */
-const ModuleDetails = {
+let MotionModuleDetails = {
     name: "mmm-motiondetect",
     version: '1.0.0',
     scripts: ["diff-cam-engine.js"],
@@ -14,17 +9,17 @@ const ModuleDetails = {
 };
 
 /** wrapper for the Magic Mirror logger */
-const Logger={
-    info:(m:string):void => Log.info(`[${ModuleDetails.name}] ${m}`),
-    warn:(m:string):void => Log.warn(`[${ModuleDetails.name}] ${m}`),
-    error:(m:string):void => Log.error(`[${ModuleDetails.name}] ${m}`)
+let MotionDetectLogger={
+    info:(m:string):void => Log.info(`[${MotionModuleDetails.name}] ${m}`),
+    warn:(m:string):void => Log.warn(`[${MotionModuleDetails.name}] ${m}`),
+    error:(m:string):void => Log.error(`[${MotionModuleDetails.name}] ${m}`)
 };
 
 //#region Declarations
 
 /** the expected socket notifications */
-type SocketMessage = 'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'|'MOTION_DETECTED'|'MOTION_TIMEOUT'|MagicMirror.NotificationType
-type ModuleMessage = 'MOTION_DETECTED'|'MOTION_TIMEOUT'|MagicMirror.ModuleNotificationType
+type SocketMessage = 'ACTIVATE_MONITOR'|'DEACTIVATE_MONITOR'|'MONITOR_ON'|'MONITOR_OFF'|'MOTION_DETECTED'|'MOTION_TIMEOUT'|NotificationType
+type ModuleMessage = 'MOTION_DETECTED'|'MOTION_TIMEOUT'|ModuleNotificationType
 
 /** simple socket message to convey the monitor power operation */
 interface IMonitorStateMessage {
@@ -33,7 +28,7 @@ interface IMonitorStateMessage {
 }
 
 /** configuration for the module */
-interface IModuleConfiguration extends MagicMirror.ModuleConfiguration {
+interface IModuleConfiguration extends ModuleConfiguration {
     /** the interval for the video capture loop */
     captureIntervalTime: number
     /** the motion detection score */
@@ -59,7 +54,7 @@ interface IModuleConfiguration extends MagicMirror.ModuleConfiguration {
 }
 
 /** module properties */
-interface IModuleProperties extends MagicMirror.IModuleProperties {
+interface IMotionModuleProperties extends IModuleProperties {
     /** the module version */
     version:string
     /** the module configuration defaults */
@@ -75,16 +70,16 @@ interface IModuleProperties extends MagicMirror.IModuleProperties {
     /** whether a power operation is in progress */
     operationPending:boolean
     /** subclass of the notification received event */
-    notificationReceived:MagicMirror.ModuleNotificationEvent
+    notificationReceived:ModuleNotificationEvent
     /** subclass of the socket notification received event */
-    socketNotificationReceived:MagicMirror.ISocketNotificationEvent<SocketMessage,IMonitorStateMessage>    
+    socketNotificationReceived:ISocketNotificationEvent<SocketMessage,IMonitorStateMessage>    
 }
 
 //#endregion
 
-const moduleProperties:IModuleProperties = {
-    name:ModuleDetails.name,
-    version:ModuleDetails.version,
+var motionModuleProperties:IMotionModuleProperties = {
+    name:MotionModuleDetails.name,
+    version:MotionModuleDetails.version,
     identifier:undefined,
     data:undefined,
     config:undefined,
@@ -112,10 +107,10 @@ const moduleProperties:IModuleProperties = {
 
     },
     onStreamReadyCallback(helper:ICameraDifferenceEngine){
-        Logger.info(`Stream ${helper.stream.id} is ready`)
+        MotionDetectLogger.info(`Stream ${helper.stream.id} is ready`)
     },
     onStreamStopCallback(helper:ICameraDifferenceEngine){
-        Logger.info('Stream is stopped!');
+        MotionDetectLogger.info('Stream is stopped!');
     },
     onImageScored(result:IDifferenceResult) {
         let now=new Date();
@@ -124,14 +119,14 @@ const moduleProperties:IModuleProperties = {
         let motionDetected=result.score > this.config.scoreThreshold
         if(motionDetected) this.lastMotionDetected=now
         if(this.operationPending) {
-            Logger.warn(`A previous power operation is in progress...`);
+            MotionDetectLogger.warn(`A previous power operation is in progress...`);
         }
         else {
             if ((this.monitorOff)) {
                 //should we turn off the monitor
                 if(motionDetected){
                     this.operationPending=true
-                    Logger.info(`Motion Detected with score ${result.score}`)
+                    MotionDetectLogger.info(`Motion Detected with score ${result.score}`)
                     if(this.config.usePower) {
                         this.sendSocketNotification('ACTIVATE_MONITOR',this.config)
                     } 
@@ -159,9 +154,9 @@ const moduleProperties:IModuleProperties = {
                 let elapsed= now.getTime() - this.lastMotionDetected
                 if(elapsed > (this.config.displayTimeout * 1000)) {
                     this.operationPending=true
-                    Logger.info(`Timeout of ${this.config.displayTimeout} seconds elapsed.`)
+                    MotionDetectLogger.info(`Timeout of ${this.config.displayTimeout} seconds elapsed.`)
                     this.operationPending=true
-                    Logger.info(`Motion Detected with score ${result.score}`)
+                    MotionDetectLogger.info(`Motion Detected with score ${result.score}`)
                     if(this.config.usePower) {
                         this.sendSocketNotification('DEACTIVATE_MONITOR',this.config)
                     }
@@ -188,7 +183,7 @@ const moduleProperties:IModuleProperties = {
                     height: this.config.captureHeight
                 }
             },
-            log:Logger,
+            log:MotionDetectLogger,
             video:this.video,
             motionCanvas:this.canvas,
             scoreThreshold:this.config.scoreThreshold,
@@ -203,37 +198,37 @@ const moduleProperties:IModuleProperties = {
         CameraDifferenceEngine.initialize(captureOptions)
             .then(async (a)=>{
                 a.start();
-                Logger.info(`Started watching camera stream on ${this.config.captureIntervalTime}.ms interval.`)
+                MotionDetectLogger.info(`Started watching camera stream on ${this.config.captureIntervalTime}.ms interval.`)
             })
     },
 
-    getScripts:() => ModuleDetails.scripts,
-    getStyles: () => ModuleDetails.styles,
+    getScripts:() => MotionModuleDetails.scripts,
+    getStyles: () => MotionModuleDetails.styles,
     getDom() {
-        Logger.info(`Updating DOM...`);
+        MotionDetectLogger.info(`Updating DOM...`);
         
         let wrapper = document.createElement("div");
         let mainContainer = document.createElement("div");
-        mainContainer.setAttribute('id',`${ModuleDetails.name}-container`)
+        mainContainer.setAttribute('id',`${MotionModuleDetails.name}-container`)
         
         let videoFigure=document.createElement('figure')
-        videoFigure.setAttribute('id',`${ModuleDetails.name}-videofigure`)
+        videoFigure.setAttribute('id',`${MotionModuleDetails.name}-videofigure`)
         videoFigure.classList.add('hidden');
 
         let video=document.createElement('video')
-        video.setAttribute('id',`${ModuleDetails.name}-videocapture`)
+        video.setAttribute('id',`${MotionModuleDetails.name}-videocapture`)
         videoFigure.append(video)
         this.video=video;
         mainContainer.appendChild(videoFigure)
 
         let canvasFigure=document.createElement('figure')
-        canvasFigure.setAttribute('id',`${ModuleDetails.name}-motionfigure`)
+        canvasFigure.setAttribute('id',`${MotionModuleDetails.name}-motionfigure`)
         canvasFigure.classList.add('hidden');
 
         let canvas=document.createElement('canvas');
         canvas.width=this.config.differenceWidth
         canvas.height=this.config.differenceHeight
-        canvas.setAttribute('id',`${ModuleDetails.name}-motioncapture`)
+        canvas.setAttribute('id',`${MotionModuleDetails.name}-motioncapture`)
         canvas.classList.add('motion-canvas')
         canvasFigure.append(canvas)
         this.canvas=canvas;
@@ -267,16 +262,16 @@ const moduleProperties:IModuleProperties = {
         Log.info(`[${this.name}] Module Stopped!`);
     },
     suspend(){
-        Logger.info(`Module Suspended...`)
+        MotionDetectLogger.info(`Module Suspended...`)
     },
     resume(){
-        Logger.info(`Module Resumed...`)
+        MotionDetectLogger.info(`Module Resumed...`)
     },
 
-    notificationReceived(notification:ModuleMessage, payload:any, sender?:MagicMirror.IModuleInstance) {
+    notificationReceived(notification:ModuleMessage, payload:any, sender?:IModuleInstance) {
         switch (notification) {
             case 'MODULE_DOM_CREATED':
-                Logger.info(`DOM Created!`);
+                MotionDetectLogger.info(`DOM Created!`);
                 this.startImageCapture();
                 break;
             default:
@@ -285,15 +280,15 @@ const moduleProperties:IModuleProperties = {
         }
     },    
     socketNotificationReceived(message:SocketMessage,payload:IMonitorStateMessage) {
-        Logger.info(`received socket notification ${message}`);
+        MotionDetectLogger.info(`received socket notification ${message}`);
         switch (message) {
             case 'MONITOR_ON':
-                Logger.info(`${message} - MonitorState:${payload.monitorState} took ${payload.duration} ms.`)
+                MotionDetectLogger.info(`${message} - MonitorState:${payload.monitorState} took ${payload.duration} ms.`)
                 this.monitorOff=false
                 this.operationPending=false
                 break;
             case 'MONITOR_OFF':
-                Logger.info(`${message} - MonitorState:${payload.monitorState} took ${payload.duration} ms.`)
+                MotionDetectLogger.info(`${message} - MonitorState:${payload.monitorState} took ${payload.duration} ms.`)
                 this.monitorOff=true
                 this.operationPending=false
                 break;
@@ -303,4 +298,4 @@ const moduleProperties:IModuleProperties = {
     }
 }
 
-Module.register(ModuleDetails.name,moduleProperties)
+Module.register(MotionModuleDetails.name,motionModuleProperties)

@@ -7,19 +7,19 @@ import * as os from "os";
 import moment, { Moment } from 'moment'
 
 /** Module details */
-const ModuleDetails = {
+let MotionModuleDetails = {
     name: "mmm-motiondetect",
     version: '1.0.0',
 };
 
 /** Log wrapper */
-const Logger = {
+let MotionHelperLogger = {
     /** log info */
-    info(message: string) {console.info(`[${ModuleDetails.name}]${message}`)},
+    info(message: string) {console.info(`[${MotionModuleDetails.name}]${message}`)},
     /** log warning */
-    warn(message: string) {console.warn(`[${ModuleDetails.name}]${message}`)},
+    warn(message: string) {console.warn(`[${MotionModuleDetails.name}]${message}`)},
     /** log error */
-    error(message: string) {console.error(`[${ModuleDetails.name}]${message}`)}
+    error(message: string) {console.error(`[${MotionModuleDetails.name}]${message}`)}
 };
 
 const operationHelper = {
@@ -106,7 +106,7 @@ let helperConfig:IHelperConfig={
         let resultCheck = this.useDPMS ?
             (s: string): boolean => { return s.trim() === 'On'} :
             (s: string): boolean => { return s.includes('=1') };
-        Logger.info(`Querying Monitor Status..`);
+        MotionHelperLogger.info(`Querying Monitor Status..`);
         let aResult:IAsyncOperation<boolean> = {
             currentOperationStart: moment().toDate(),
             currentOperationEnd: undefined,
@@ -117,9 +117,9 @@ let helperConfig:IHelperConfig={
             aResult.currentOperationEnd=moment().toDate()
             if (err) {
                 aResult.success=false
-                Logger.error(`Error calling monitor status: ${stderr}`);
+                MotionHelperLogger.error(`Error calling monitor status: ${stderr}`);
             }
-            Logger.info(`Monitor is currently:${stdout}`);
+            MotionHelperLogger.info(`Monitor is currently:${stdout}`);
             aResult.result=resultCheck(stdout)
             resultCallback(aResult);
         });
@@ -138,10 +138,10 @@ let helperConfig:IHelperConfig={
                 if (err) {
                     aResult.success=false;
                     aResult.result=false;
-                    Logger.error(`Error activating monitor: ${code}`);
+                    MotionHelperLogger.error(`Error activating monitor: ${code}`);
                 } else {
                     aResult.result=true;
-                    Logger.info(`Monitor has been activated`);
+                    MotionHelperLogger.info(`Monitor has been activated`);
                     this.monitorOn=true
                 }
                 resultCallback(aResult)
@@ -149,11 +149,11 @@ let helperConfig:IHelperConfig={
         };
         if (this.config.checkState) {
             this.isMonitorOn((r:IAsyncOperation<boolean>)=>{
-                Logger.info(`Monitor power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
+                MotionHelperLogger.info(`Monitor power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
                 if (r.result) {
                     aResult.currentOperationEnd=moment().toDate()
                     aResult.result=true;
-                    Logger.info('The monitor is already on.');
+                    MotionHelperLogger.info('The monitor is already on.');
                     resultCallback(aResult);
                 }
                 else{
@@ -162,7 +162,7 @@ let helperConfig:IHelperConfig={
             });
         }
         else {
-            Logger.info("Not checking monitor state")
+            MotionHelperLogger.info("Not checking monitor state")
             turnOnMonitor();
         }
     },
@@ -181,44 +181,44 @@ let helperConfig:IHelperConfig={
                 if (err) {
                     aResult.success=false;
                     aResult.result=true;
-                    Logger.error(`Error deactivating monitor: ${code}`);
+                    MotionHelperLogger.error(`Error deactivating monitor: ${code}`);
                 } else {
                     aResult.result=false;
                     this.monitorOn=false;
-                    Logger.info(`Monitor has been deactivated`);
+                    MotionHelperLogger.info(`Monitor has been deactivated`);
                 }
                 resultCallback(aResult)
             });
         };
         if (this.config.checkState) {
             this.isMonitorOn((r:IAsyncOperation<boolean>)=>{
-                Logger.info(`Monitor power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
+                MotionHelperLogger.info(`Monitor power check took ${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms.`)
                 if (r.result) {
                     turnOffMonitor();
                 }
                 else{
                     aResult.currentOperationEnd=moment().toDate()
                     aResult.result=true;
-                    Logger.info('The monitor is already off.');
+                    MotionHelperLogger.info('The monitor is already off.');
                     resultCallback(aResult);
                 }
             });
         }
         else {
-            Logger.info("Not checking monitor state")
+            MotionHelperLogger.info("Not checking monitor state")
             turnOffMonitor();
         }
     },
 
     socketNotificationReceived(notification: SocketNotification, payload: IModuleConfiguration) {
-        Logger.info(`Received Notification ${notification}`);
+        MotionHelperLogger.info(`Received Notification ${notification}`);
         if (payload) {
             this.config=payload
         }
         switch (notification) {
             case 'ACTIVATE_MONITOR':
                 if(!this.operationRunning) {
-                    Logger.info(`Activating Monitor - Use DPMS:${this.useDPMS} Check State:${payload.checkState}`)
+                    MotionHelperLogger.info(`Activating Monitor - Use DPMS:${this.useDPMS} Check State:${payload.checkState}`)
                     this.operationRunning=true
                     this.activateMonitor((r:BooleanAsyncResult) => {
                         if(r.success){
@@ -227,21 +227,21 @@ let helperConfig:IHelperConfig={
                                 duration:operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)
                             };
                             this.sendSocketNotification('MONITOR_ON',mess)
-                            Logger.info(`${notification} transition to Monitor State:${mess.monitorState} took ${mess.duration} ms.`)
+                            MotionHelperLogger.info(`${notification} transition to Monitor State:${mess.monitorState} took ${mess.duration} ms.`)
                         }
                         else {
-                            Logger.error('Turning on the monitor failed')
+                            MotionHelperLogger.error('Turning on the monitor failed')
                         }
                         this.operationRunning=false
                     })
                 }
                 else {
-                    Logger.warn('An operation is already in progress')
+                    MotionHelperLogger.warn('An operation is already in progress')
                 }
                 break;
             case 'DEACTIVATE_MONITOR':
                 if(!this.operationRunning) {
-                    Logger.info(`Deactivating Monitor - Use DPMS:${this.useDPMS} Check State:${payload.checkState}`)
+                    MotionHelperLogger.info(`Deactivating Monitor - Use DPMS:${this.useDPMS} Check State:${payload.checkState}`)
                     this.operationRunning=true
                     this.deActivateMonitor((r:BooleanAsyncResult) => {
                         if(r.success){
@@ -250,16 +250,16 @@ let helperConfig:IHelperConfig={
                                 duration:operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)
                             };
                             this.sendSocketNotification('MONITOR_OFF',mess)
-                            Logger.info(`${notification} transition to Monitor State:${mess.monitorState} took ${mess.duration} ms.`)
+                            MotionHelperLogger.info(`${notification} transition to Monitor State:${mess.monitorState} took ${mess.duration} ms.`)
                         }
                         else {
-                            Logger.error('Turning off the monitor failed')
+                            MotionHelperLogger.error('Turning off the monitor failed')
                         }
                         this.operationRunning=false
                     })
                 }
                 else {
-                    Logger.warn('An operation is already in progress')
+                    MotionHelperLogger.warn('An operation is already in progress')
                 }
                 break;
             case 'MOTION_DETECTED':
@@ -270,20 +270,20 @@ let helperConfig:IHelperConfig={
         }
     },
     start(){
-        Logger.info(`Starting Module Helper version : ${ModuleDetails.version} - ${os.platform()}:${os.arch()}`);
+        MotionHelperLogger.info(`Starting Module Helper version : ${MotionModuleDetails.version} - ${os.platform()}:${os.arch()}`);
         //we'll force a 'safe config until we get on via socket
         this.useDPMS=!(os.arch()==='arm')
         this.config={ checkState:true}
-        Logger.info("Module Started!");
+        MotionHelperLogger.info("Module Started!");
     },
     stop(){
-        Logger.info(`Stopping Module Helper...`);
+        MotionHelperLogger.info(`Stopping Module Helper...`);
         //we'll try and turn the monitor on the way out.
         this.activateMonitor((r:IAsyncOperation<boolean>)=>{
             if(!r.success || !r.result){
-                Logger.error(`Error re-activating monitor`)
+                MotionHelperLogger.error(`Error re-activating monitor`)
             }
-            Logger.info(`Power Check took .${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms..`)
+            MotionHelperLogger.info(`Power Check took .${operationHelper.itTookInMs(r.currentOperationStart,r.currentOperationEnd)} ms..`)
         });
     }
 };

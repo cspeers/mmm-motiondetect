@@ -12,9 +12,10 @@
         "composite": true,
         "outDir": "../",
         "baseUrl": "../",
-        "paths": {
-            "magicmirror":["@types/magicmirror"]
-        }
+        "typeRoots": [
+            "../node_modules/@types",
+            "../@types/"
+        ]
     },
     "exclude": [
 
