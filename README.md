@@ -1,9 +1,10 @@
 # mmm-motiondetect
 
 ## A simple port of the existing motion detection module but done in Typescript because
+---
+## Settings
 - Uses DPMS or vgencmd depending on platform
 - Alternatively it will just force hide all modules to leave a black screen
----
 ## Configuration Options
 
 - **captureIntervalTime**   number
