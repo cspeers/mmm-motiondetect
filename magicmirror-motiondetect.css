@@ -10,7 +10,7 @@ body {
     word-break: break-word;
 }
 
-div.magicmirror-motiondetect div.module-content {
+div.mmm-motiondetect div.module-content {
     max-width: 40%;
     margin: 0 auto 10px auto;
     padding: 1em 1.5em 1.3em 1.5em;
@@ -22,7 +22,7 @@ html {
 
 
 @media screen and (min-height:800px) {
-    video, canvas {
+    .mmm-motiondetect video, .mmm-motiondetect canvas {
         width: 320px;
         height: 240px;
         background-color: #999;
@@ -30,7 +30,7 @@ html {
 }
 
 @media screen and (min-height:1200px) and (orientation: landscape) {
-    video, canvas {
+    .mmm-motiondetect video, .mmm-motiondetect canvas {
         width: 480px;
         height: 360px;
         background-color: #999;
@@ -38,7 +38,7 @@ html {
 }
 
 @media screen and (min-height:1500px) and (orientation: landscape) {
-    video, canvas {
+    .mmm-motiondetect video, .mmm-motiondetect canvas {
         width: 640px;
         height: 480px;
         background-color: #999;
