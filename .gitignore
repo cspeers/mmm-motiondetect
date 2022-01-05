@@ -115,3 +115,4 @@ client/*.js
 client/*.js.map
 server/*.js
 server/*.js.map
+*.d.ts.map
