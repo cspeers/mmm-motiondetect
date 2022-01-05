@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "inlineSourceMap": false,
+    "noImplicitAny": true,
+    "target": "ES6",
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "diagnostics": false,
+    "listFiles": false,
+    "noEmitOnError": true,
+    "composite": true,
+    "declarationMap": true,
+    "outDir": "../",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": ["../@types", "../node_modules/@types"]
+  },
+  "include": ["./*"],
+  "exclude": ["../@types/node_helper/*"]
+}
