@@ -1,20 +1,23 @@
 {
-    "name": "mmm-motiondetect",
-    "author": {
-        "name": "Chris Speers"
-    },
-    "version": "1.0.0",
-    "description": "Motion Detection Module for MagicMirror",
-    "scripts": {
-        "install": "tsc -b",
-        "preinstall": "./cleanup.sh"
-    },
-    "devDependencies": {
-        "@types/node": "^13.7.7",
-        "@types/webrtc": ">=0.0.26",
-        "@types/moment": "2.13.0"
-    },
-    "dependencies": {
-        "typescript": ">=3.8.3"
-    }
+  "name": "mmm-motiondetect",
+  "author": {
+    "name": "Chris Speers"
+  },
+  "repository": {
+    "url": "https://github.com/cspeers/mmm-motiondetect"
+  },
+  "version": "1.0.0",
+  "description": "Motion Detection Module for MagicMirror",
+  "scripts": {
+    "install": "tsc -b",
+    "preinstall": "./cleanup.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^13.7.7",
+    "@types/webrtc": ">=0.0.26",
+    "@types/moment": "2.13.0"
+  },
+  "dependencies": {
+    "typescript": ">=3.8.3"
+  }
 }
