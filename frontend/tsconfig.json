@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "noImplicitAny": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "diagnostics": false,
+    "listFiles": false,
+    "noEmitOnError": true,
+    "composite": true,
+    "baseUrl": "../",
+    "outDir": "../",
+    "typeRoots": ["../node_modules/@types", "../@types/"]
+  },
+  "exclude": [],
+  "include": ["./*.ts"]
+}

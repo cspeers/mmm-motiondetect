@@ -1,7 +1,9 @@
-rm *.d.ts -f
+rm *.d.ts* -f
 rm *.js -f
 rm *.js.map -f
-rm ./client/*.js -f
-rm ./client/*.js.map -f
-rm ./server/*.js -f
-rm ./server/*.js.map -f
+rm ./frontend/*.js -f
+rm ./frontend/*.map -f
+rm ./frontend/*.d.ts* -f
+rm ./backend/*.js -f
+rm ./backend/*.map -f
+rm ./backend/*.d.ts* -f

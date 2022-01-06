@@ -1,18 +1,14 @@
 {
-    "compilerOptions": {
-        "sourceMap": true,
-        "alwaysStrict": true,
-        "diagnostics": false,
-        "listFiles": false,
-        "esModuleInterop": true,
-        "noEmitOnError": true,
-        "declaration": false
-    },
-    "references": [
-        {"path": "./server"},
-        {"path": "./client"}
-    ],
-    "exclude": [
-
-    ]
+  "compilerOptions": {
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "diagnostics": false,
+    "listFiles": false,
+    "esModuleInterop": true,
+    "noEmitOnError": true,
+    "declaration": false,
+    "typeRoots": ["./node_modules/@types", "./@types/"]
+  },
+  "references": [{ "path": "./frontend" }, { "path": "./backend" }],
+  "exclude": []
 }
